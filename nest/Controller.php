@@ -42,7 +42,7 @@ class BASE_Upper_singularController extends Controller
      * Return the specified BASE_lower_singular for the NEST_lower_singular.
      *
      * @param String $NEST_lower_singularId  The NEST_lower_singular id
-     * @param String $BASE_lower_singularId The NEST_lower_singular id
+     * @param String $BASE_lower_singularId The BASE_lower_singular id
      *
      * @return \Illuminate\Http\Response
      */
