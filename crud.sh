@@ -24,7 +24,7 @@ BASE_Upper_plural=$(perl -ne 'print ucfirst' <<<"$BASE_lower_plural")
 # NESTING
 echo "======================================================="
 while true; do
-    read -p " 2 Nest model? [y/n]:" yn
+    read -p "Nest model? [y/n]:" yn
     case $yn in
         [Yy]* ) echo "Input nesting parent model name:" \
             && read -e -p "Singular:" NEST_MODEL_SINGULAR \
@@ -74,14 +74,15 @@ $DOCKER_EXEC php artisan make:request ${BASE_Upper_singular}Request
 echo "======================================================="
 # Copy & Edit Placeholder Model
 echo "Copy & Edit Placeholder Model"
-docker cp base/Model.php $CONTAINER:/var/www/html/app/Models/${BASE_Upper_singular}.php
-$DOCKER_EXEC sed -i "s+BASE_Upper_singular+${BASE_Upper_singular}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
 if [ $NEST_MODEL_SINGULAR ] ; then
-    $DOCKER_EXEC sed -i "s+//RELATION_PLACEHOLDER+/** \n * Get the ${NEST_Upper_singular} that belongs to this ${BASE_Upper_singular}. \n \n * @return Nest_singular \n */ \n public function nest_plural() \n { \n return \$this->belongsTo(Nest_singular::class); \n }+" /var/www/html/app/Models/${BASE_Upper_singular}.php
-    $DOCKER_EXEC sed -i "s+Nest_singular+${NEST_Upper_singular}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
-    $DOCKER_EXEC sed -i "s+nest_plural+${NEST_lower_plural}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
+    docker cp nest/Model.php $CONTAINER:/var/www/html/app/Models/${BASE_Upper_singular}.php
+else
+    docker cp base/Model.php $CONTAINER:/var/www/html/app/Models/${BASE_Upper_singular}.php
 fi
-
+$DOCKER_EXEC sed -i "s+BASE_Upper_singular+${BASE_Upper_singular}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
+$DOCKER_EXEC sed -i "s+BASE_lower_singular+${BASE_lower_singular}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
+$DOCKER_EXEC sed -i "s+NEST_Upper_singular+${NEST_Upper_singular}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
+$DOCKER_EXEC sed -i "s+NEST_lower_singular+${NEST_lower_singular}+g" /var/www/html/app/Models/${BASE_Upper_singular}.php
 
 # Copy & Edit Placeholder Migration
 echo "Copy & Edit Placeholder Migration"
@@ -111,10 +112,17 @@ $DOCKER_EXEC sed -i "s+BASE_lower_plural+${BASE_lower_plural}+g" /var/www/html/a
 
 # Copy & Edit Placeholder Policy
 echo "Copy & Edit Placeholder Policy"
-docker cp base/Policy.php $CONTAINER:/var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
-$DOCKER_EXEC sed -i "s+BASE_lower_singular+${BASE_lower_singular}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+if [ $NEST_MODEL_SINGULAR ] ; then
+    docker cp nest/Policy.php $CONTAINER:/var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+else
+    docker cp base/Policy.php $CONTAINER:/var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+fi
 $DOCKER_EXEC sed -i "s+BASE_Upper_singular+${BASE_Upper_singular}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
-
+$DOCKER_EXEC sed -i "s+BASE_lower_singular+${BASE_lower_singular}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+$DOCKER_EXEC sed -i "s+BASE_lower_plural+${BASE_lower_plural}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+$DOCKER_EXEC sed -i "s+NEST_Upper_singular+${NEST_Upper_singular}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+$DOCKER_EXEC sed -i "s+NEST_lower_singular+${NEST_lower_singular}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
+$DOCKER_EXEC sed -i "s+NEST_lower_plural+${NEST_lower_plural}+g" /var/www/html/app/Policies/${BASE_Upper_singular}Policy.php
 
 # Copy & Edit Placeholder Request
 echo "Copy & Edit Placeholder Request"
@@ -146,19 +154,7 @@ done
 echo "======================================================="
 echo "Insert Routing into 'api.php'"
 $DOCKER_EXEC sed -i "s+//USE_PLACEHOLDER+use App\\\Http\\\Controllers\\\\${BASE_Upper_singular}Controller;\n//USE_PLACEHOLDER+" /var/www/html/routes/api.php
-if [ $NEST_MODEL_SINGULAR ] ; then
-    while true; do
-        read -p "Shallow nesting? [y/n]:" yn
-        case $yn in
-            [Yy]* ) $DOCKER_EXEC sed -i "s+//ROUTE_PLACEHOLDER+Route::apiResource('${ROUTE}', ${BASE_Upper_singular}Controller::class)->shallow();\n        //ROUTE_PLACEHOLDER+" /var/www/html/routes/api.php \
-                    ; break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer yes or no [y/n].";;
-        esac
-    done
-else
-    $DOCKER_EXEC sed -i "s+//ROUTE_PLACEHOLDER+Route::apiResource('${ROUTE}', ${BASE_Upper_singular}Controller::class);\n        //ROUTE_PLACEHOLDER+" /var/www/html/routes/api.php
-fi
+$DOCKER_EXEC sed -i "s+//ROUTE_PLACEHOLDER+Route::apiResource('${ROUTE}', ${BASE_Upper_singular}Controller::class);\n        //ROUTE_PLACEHOLDER+" /var/www/html/routes/api.php
 
 
 
