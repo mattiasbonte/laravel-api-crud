@@ -15,9 +15,9 @@ class BASE_Upper_singularPolicy
     /**
      * Determine whether the user can create a new BASE_lower_singular for the NEST_lower_singular.
      *
-     * @param \App\Models\User     $user     The authenticated user
-     * @param \App\Models\BASE_Upper_singular $BASE_lower_singular The requested BASE_lower_singular
-     * @param \App\Models\NEST_Upper_singular  $NEST_lower_singular  The NEST_lower_singular
+     * @param \App\Models\User    $user    The authenticated user
+     * @param \App\Models\BASE_Upper_singular     $BASE_lower_singular     The requested BASE_lower_singular
+     * @param \App\Models\NEST_Upper_singular $NEST_lower_singular The NEST_lower_singular
      *
      * @return Illuminate\Auth\Access\Response
      */
@@ -32,9 +32,9 @@ class BASE_Upper_singularPolicy
     /**
      * Determine whether the user can view all the BASE_lower_plural for the NEST_lower_singular.
      *
-     * @param \App\Models\User     $user     The authenticated user
-     * @param \App\Models\BASE_Upper_singular $BASE_lower_singular The requested BASE_lower_singular
-     * @param \App\Models\NEST_Upper_singular  $NEST_lower_singular  The NEST_lower_singular
+     * @param \App\Models\User    $user    The authenticated user
+     * @param \App\Models\BASE_Upper_singular     $BASE_lower_singular     The requested BASE_lower_singular
+     * @param \App\Models\NEST_Upper_singular $NEST_lower_singular The NEST_lower_singular
      *
      * @return Illuminate\Auth\Access\Response
      */
@@ -42,21 +42,22 @@ class BASE_Upper_singularPolicy
     {
         return $user->NEST_lower_plural->contains($NEST_lower_singular)
             ? Response::allow()
-            : Response::deny('Unauthorized: You cannot see the tags for this NEST_lower_singular.');
+            : Response::deny('Unauthorized: You cannot see the BASE_lower_plural for this NEST_lower_singular.');
     }
 
     /**
      * Determine whether the user can view the BASE_lower_singular for the NEST_lower_singular.
      *
-     * @param \App\Models\User     $user     The authenticated user
-     * @param \App\Models\BASE_Upper_singular $BASE_lower_singular The requested BASE_lower_singular
-     * @param \App\Models\NEST_Upper_singular  $NEST_lower_singular  The NEST_lower_singular
+     * @param \App\Models\User    $user    The authenticated user
+     * @param \App\Models\BASE_Upper_singular     $BASE_lower_singular     The requested BASE_lower_singular
+     * @param \App\Models\NEST_Upper_singular $NEST_lower_singular The NEST_lower_singular
      *
      * @return Illuminate\Auth\Access\Response
      */
     public function view(User $user, BASE_Upper_singular $BASE_lower_singular, NEST_Upper_singular $NEST_lower_singular)
     {
         return $user->NEST_lower_plural->contains($NEST_lower_singular)
+            && $NEST_lower_singular->BASE_lower_plural->contains($BASE_lower_singular)
             ? Response::allow()
             : Response::deny('Unauthorized: You cannot see the BASE_lower_singular for this NEST_lower_singular.');
     }
@@ -64,16 +65,17 @@ class BASE_Upper_singularPolicy
     /**
      * Determine whether the user can update the BASE_lower_singular for the NEST_lower_singular.
      *
-     * @param \App\Models\User     $user     The authenticated user
-     * @param \App\Models\BASE_Upper_singular $BASE_lower_singular The requested BASE_lower_singular
-     * @param \App\Models\NEST_Upper_singular  $NEST_lower_singular  The NEST_lower_singular
+     * @param \App\Models\User    $user    The authenticated user
+     * @param \App\Models\BASE_Upper_singular     $BASE_lower_singular     The requested BASE_lower_singular
+     * @param \App\Models\NEST_Upper_singular $NEST_lower_singular The NEST_lower_singular
      *
      * @return Illuminate\Auth\Access\Response
      */
     public function update(User $user, BASE_Upper_singular $BASE_lower_singular, NEST_Upper_singular $NEST_lower_singular)
     {
-        return $user->NEST_lower_plural->contains($NEST_lower_singular) && $user->isAdmin($NEST_lower_singular)
-            || $user->NEST_lower_plural->contains($NEST_lower_singular) && $user->isManager($NEST_lower_singular)
+        return $user->NEST_lower_plural->contains($NEST_lower_singular)
+            && ($user->isAdmin($NEST_lower_singular) || $user->isManager($NEST_lower_singular))
+            && $NEST_lower_singular->BASE_lower_plural->contains($BASE_lower_singular)
             ? Response::allow()
             : Response::deny('Unauthorized: You cannot update this BASE_lower_singular for this NEST_lower_singular.');
     }
@@ -81,16 +83,17 @@ class BASE_Upper_singularPolicy
     /**
      * Determine whether the user can delete the BASE_lower_singular for the NEST_lower_singular.
      *
-     * @param \App\Models\User     $user     The authenticated user
-     * @param \App\Models\BASE_Upper_singular $BASE_lower_singular The requested BASE_lower_singular
-     * @param \App\Models\NEST_Upper_singular  $NEST_lower_singular  The NEST_lower_singular
+     * @param \App\Models\User    $user    The authenticated user
+     * @param \App\Models\BASE_Upper_singular     $BASE_lower_singular     The requested BASE_lower_singular
+     * @param \App\Models\NEST_Upper_singular $NEST_lower_singular The NEST_lower_singular
      *
      * @return Illuminate\Auth\Access\Response
      */
     public function delete(User $user, BASE_Upper_singular $BASE_lower_singular, NEST_Upper_singular $NEST_lower_singular)
     {
-        return $user->NEST_lower_plural->contains($NEST_lower_singular) && $user->isAdmin($NEST_lower_singular)
-            || $user->NEST_lower_plural->contains($NEST_lower_singular) && $user->isManager($NEST_lower_singular)
+        return $user->NEST_lower_plural->contains($NEST_lower_singular)
+            && ($user->isAdmin($NEST_lower_singular) || $user->isManager($NEST_lower_singular))
+            && $NEST_lower_singular->BASE_lower_plural->contains($BASE_lower_singular)
             ? Response::allow()
             : Response::deny('Unauthorized: You cannot delete this BASE_lower_singular for this NEST_lower_singular.');
     }
